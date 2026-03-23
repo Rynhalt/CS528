@@ -17,7 +17,11 @@ LOG_OBJECT = os.environ.get("LOG_OBJECT", "forbidden-logs/forbidden.log")
 REQUEST_QUEUE_SIZE = int(os.environ.get("REQUEST_QUEUE_SIZE", "32"))
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO").upper()
 
-cloud_logging.Client().setup_logging()
+PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT") or os.environ.get("PROJECT_ID")
+if not PROJECT_ID:
+    raise RuntimeError("GOOGLE_CLOUD_PROJECT or PROJECT_ID must be set")
+
+cloud_logging.Client(project=PROJECT_ID).setup_logging()
 logger = logging.getLogger("hw4_service2")
 logger.setLevel(getattr(logging, LOG_LEVEL, logging.INFO))
 storage_client = storage.Client()
