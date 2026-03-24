@@ -38,7 +38,15 @@ if not BUCKET_NAME:
 cloud_logging.Client().setup_logging()
 logger = logging.getLogger("hw4_service1")
 logger.setLevel(getattr(logging, LOG_LEVEL, logging.INFO))
-storage_client = storage.Client()
+import os
+from google.cloud import storage
+from google.auth import compute_engine
+
+credentials = compute_engine.Credentials()
+client = storage.Client(
+    project=os.environ.get("GOOGLE_CLOUD_PROJECT"),
+    credentials=credentials
+)
 
 
 def log_struct(severity: str, event_type: str, **fields) -> None:

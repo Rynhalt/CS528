@@ -24,7 +24,15 @@ if not PROJECT_ID:
 cloud_logging.Client(project=PROJECT_ID).setup_logging()
 logger = logging.getLogger("hw4_service2")
 logger.setLevel(getattr(logging, LOG_LEVEL, logging.INFO))
-storage_client = storage.Client()
+import os
+from google.cloud import storage
+from google.auth import compute_engine
+
+credentials = compute_engine.Credentials()
+client = storage.Client(
+    project=os.environ.get("GOOGLE_CLOUD_PROJECT"),
+    credentials=credentials
+)
 
 
 def append_line_to_gcs(bucket_name: str, object_name: str, line: str) -> None:
