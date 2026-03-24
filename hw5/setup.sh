@@ -1,11 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-PROJECT_ID="$(gcloud config get-value project 2>/dev/null)"
-if [[ -z "${PROJECT_ID}" ]]; then
-  echo "No active gcloud project set."
-  exit 1
-fi
+PROJECT_ID="$(gcloud config get-value project)"
 
 PROJECT_NUMBER="$(gcloud projects describe "${PROJECT_ID}" --format='value(projectNumber)')"
 
@@ -13,37 +9,36 @@ REGION="us-central1"
 ZONE="us-central1-c"
 NETWORK="default"
 
-SERVICE1_VM="cs528-hw4-service1"
-SERVICE2_VM="cs528-hw4-service2"
+SERVICE1_VM="cs528-hw5-service1"
+SERVICE2_VM="cs528-hw5-service2"
 
-SERVICE1_TAG="hw4-service1"
-SERVICE2_TAG="hw4-service2"
+SERVICE1_TAG="hw5-service1"
+SERVICE2_TAG="hw5-service2"
 
-SERVICE1_SA="hw4-service1-sa"
-SERVICE2_SA="hw4-service2-sa"
+SERVICE1_SA="hw5-service1-sa"
+SERVICE2_SA="hw5-service2-sa"
 
 SERVICE1_SA_EMAIL="${SERVICE1_SA}@${PROJECT_ID}.iam.gserviceaccount.com"
 SERVICE2_SA_EMAIL="${SERVICE2_SA}@${PROJECT_ID}.iam.gserviceaccount.com"
 
-SERVICE1_IP_NAME="hw4-service1-ip"
+SERVICE1_IP_NAME="hw5-service1-ip"
 
 BUCKET_NAME="slime123-cs528-hw5"
 BUCKET_PREFIX=""
 LOG_OBJECT="forbidden-logs/forbidden.log"
 
-# Change these two lines.
-REPO_URL="https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPO.git"
+REPO_URL="https://github.com/Rynhalt/CS528.git"
 REPO_BRANCH="main"
 
 # Service accounts
 if ! gcloud iam service-accounts describe "${SERVICE1_SA_EMAIL}" >/dev/null 2>&1; then
   gcloud iam service-accounts create "${SERVICE1_SA}" \
-    --display-name="HW4 Service 1 SA"
+    --display-name="HW5 Service 1 SA"
 fi
 
 if ! gcloud iam service-accounts describe "${SERVICE2_SA_EMAIL}" >/dev/null 2>&1; then
   gcloud iam service-accounts create "${SERVICE2_SA}" \
-    --display-name="HW4 Service 2 SA"
+    --display-name="HW5 Service 2 SA"
 fi
 
 # IAM bindings
@@ -64,15 +59,15 @@ gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
   --role="roles/storage.objectAdmin" >/dev/null
 
 # Firewall rules
-if ! gcloud compute firewall-rules describe allow-hw4-service1 >/dev/null 2>&1; then
-  gcloud compute firewall-rules create allow-hw4-service1 \
+if ! gcloud compute firewall-rules describe allow-hw5-service1 >/dev/null 2>&1; then
+  gcloud compute firewall-rules create allow-hw5-service1 \
     --network="${NETWORK}" \
     --allow=tcp:8080 \
     --target-tags="${SERVICE1_TAG}"
 fi
 
-if ! gcloud compute firewall-rules describe allow-hw4-service2 >/dev/null 2>&1; then
-  gcloud compute firewall-rules create allow-hw4-service2 \
+if ! gcloud compute firewall-rules describe allow-hw5-service2 >/dev/null 2>&1; then
+  gcloud compute firewall-rules create allow-hw5-service2 \
     --network="${NETWORK}" \
     --allow=tcp:9090 \
     --target-tags="${SERVICE2_TAG}"

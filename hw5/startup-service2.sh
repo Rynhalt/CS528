@@ -8,19 +8,22 @@ if [ -f /var/log/startup_already_done ]; then
     exit 0
 fi
 
-# ---- HARDCODED CONFIG ----
-REPO_URL="https://github.com/Rynhalt/CS528.git"
-REPO_BRANCH="main"
+get_md() {
+    curl -fs -H "Metadata-Flavor: Google" \
+      "http://metadata.google.internal/computeMetadata/v1/instance/attributes/$1"
+}
 
-BUCKET_NAME="slime123-cs528-hw5"
-LOG_OBJECT="forbidden-logs/forbidden.log"
+REPO_URL="$(get_md repo-url)"
+REPO_BRANCH="$(get_md repo-branch)"
+BUCKET_NAME="$(get_md bucket-name)"
+LOG_OBJECT="$(get_md log-object)"
 
 APP_DIR="/opt/hw5repo"
 VENV_DIR="/opt/hw5venv"
 
 # ---- SETUP ----
 apt-get update
-apt-get install -y git python3 python3-pip python3-venv
+apt-get install -y git python3 python3-pip python3-venv ca-certificates
 
 rm -rf "${APP_DIR}"
 git clone --branch "${REPO_BRANCH}" "${REPO_URL}" "${APP_DIR}"
@@ -41,7 +44,7 @@ export LOG_LEVEL=INFO
 export GOOGLE_CLOUD_PROJECT="$(curl -fs -H 'Metadata-Flavor: Google' \
   http://metadata.google.internal/computeMetadata/v1/project/project-id)"
 
-nohup "${VENV_DIR}/bin/python" service2_vm.py \
+exec "${VENV_DIR}/bin/python" service2_vm.py \
   >> /var/log/service2.log 2>&1 &
 
 touch /var/log/startup_already_done

@@ -18,8 +18,8 @@ REPO_BRANCH="$(get_md repo-branch)"
 BUCKET_NAME="$(get_md bucket-name)"
 BUCKET_PREFIX="$(get_md bucket-prefix || true)"
 REPORTER_URL="$(get_md reporter-url)"
-APP_DIR="/opt/hw4repo"
-VENV_DIR="/opt/hw4venv"
+APP_DIR="/opt/hw5repo"
+VENV_DIR="/opt/hw5venv"
 
 apt-get update
 apt-get install -y git python3 python3-pip python3-venv
@@ -29,7 +29,7 @@ git clone --branch "${REPO_BRANCH}" "${REPO_URL}" "${APP_DIR}"
 
 python3 -m venv "${VENV_DIR}"
 "${VENV_DIR}/bin/pip" install --upgrade pip
-"${VENV_DIR}/bin/pip" install -r "${APP_DIR}/hw4/requirements.txt"
+"${VENV_DIR}/bin/pip" install -r "${APP_DIR}/hw5/requirements.txt"
 
 export HOST=0.0.0.0
 export PORT=8080
@@ -41,4 +41,4 @@ export LOG_LEVEL=INFO
 
 touch /var/log/startup_already_done
 
-exec "${VENV_DIR}/bin/python" "${APP_DIR}/hw4/service1_vm.py"
+exec "${VENV_DIR}/bin/python" "${APP_DIR}/hw5/service1_vm.py"
